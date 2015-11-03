@@ -1,0 +1,382 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Plantilla para informe de práctica, DISC, UCN.
+% Original por Felipe Narváez, versión modificada por Brian Keith.
+% Compilar dos veces, por razones de que el compilador crea un archivo 
+% para la tabla de contenido, para que este funcione compilar una vez más.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[oneside,12pt, letterpaper, titlepage]{book}
+% Esto es para poder escribir acentos directamente:
+\usepackage[utf8x]{inputenc}
+% Esto es para que el LaTeX sepa que el texto esta en español:
+\usepackage[spanish,activeacute,es-lcroman]{babel}
+% Paquetes de la AMS:
+\usepackage{amsmath, amsthm, amsfonts}
+%Otros paquetes necesarios.
+%\usepackage{apacite}
+
+\usepackage{graphicx}
+\usepackage[tc]{titlepic}
+\usepackage{fancyhdr}
+\usepackage[T1]{fontenc}
+\usepackage{titlesec}
+\usepackage{float}
+\usepackage{pslatex}  %Esto utiliza la fuente Times Roman (Casi indistinguible de Times New Roman)
+\usepackage[titletoc]{appendix} %Este paquete para los anexos.
+\usepackage{setspace} %Para espacio de 1.5
+\usepackage{listings}  %Para codigo
+\usepackage{multirow} %Tablas con fusiones de fila.
+\usepackage{rotating}
+\usepackage[numbers]{natbib}
+\usepackage[none]{hyphenat} % Evita que las palabras sean cortadas
+% Corta los url demasiado largos
+\usepackage{url}
+\usepackage{breakurl}
+\usepackage[breaklinks]{hyperref}
+% Para el texto alrededor de la imagen
+\usepackage{wrapfig}
+\usepackage{subcaption} % para acomodar las imágenes
+\usepackage{lscape} %para hoja horizontal
+\usepackage[normalem]{ulem} % tachar texto
+
+
+%--------------------------------------------------------------------------
+% Defino un nuevo comando para agregar espacios de 20 puntos, para utilizar
+% 20 espacios solo utilizar las palabras \hsp
+\newcommand{\hsp}{\hspace{2pt}}
+%--------------------------------------------------------------------------
+% Defino el nuevo titulo para capítulos con números romanos, como por
+% ejemplo:
+% I Introducción.
+\renewcommand{\thechapter}{\Roman{chapter}}
+%--------------------------------------------------------------------------
+% Defino el nuevo titulo para subsecciones de capítulos con números árabes
+% como por ejemplo:
+% 1.1 Antecedentes generales 
+\renewcommand{\thesection}{\arabic{chapter}.\arabic{section}}
+%--------------------------------------------------------------------------
+\addto\captionsspanish{% Replace "english" with the language you use
+  \renewcommand{\contentsname}%
+    {ÍNDICE GENERAL}%
+}
+
+%--------------------------------------------------------------------------
+% Defino el nuevo titulo para figuras de capitulos con numeros arabes
+% como por ejemplo:
+% 1.1 Antecedentes generales 
+\renewcommand{\thefigure}{\arabic{chapter}.\arabic{figure}}
+%--------------------------------------------------------------------------
+\renewcommand{\thetable}{\arabic{chapter}.\arabic{table}}
+%-------------------------------------------------------------------------
+
+\titleformat*{\section}{\fontsize{12}{12}\bfseries}
+\titleformat*{\subsection}{\fontsize{12}{12}\bfseries}
+\titleformat*{\subsubsection}{\fontsize{12}{12}\bfseries}
+
+
+%--------------------------------------------------------------------------
+%Margenes de pagina.
+\usepackage[top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm]{geometry}
+%--------------------------------------------------------------------------
+%Que aparezca la bibliografía en el índice.
+%\usepackage{tocbibind}
+%--------------------------------------------------------------------------
+%Numeros de pagina en posiciones correctas.
+\usepackage{fancyhdr} 
+\pagestyle{myheadings}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead[L]{}
+\fancyhead[R]{\nouppercase{\thepage}}
+\fancyfoot[C]{}
+%--------------------------------------------------------------------------
+\usepackage{afterpage}
+\usepackage{textcase}
+\usepackage{enumitem}
+%Listas ordenadas
+\usepackage{datatool}
+\newcommand{\sortitem}[1]{%
+  \DTLnewrow{list}% Create a new entry
+  \DTLnewdbentry{list}{description}{#1}% Add entry as description
+}
+\newenvironment{sortedlist}{%
+  \DTLifdbexists{list}{\DTLcleardb{list}}{\DTLnewdb{list}}% Create new/discard old list
+}{%
+  \DTLsort{description}{list}% Sort list
+  \begin{itemize}[leftmargin=*,label={}]%
+    \DTLforeach*{list}{\theDesc=description}{%
+      \item \theDesc}% Print each item
+  \end{itemize}%
+}
+
+%Modificaciones a la tabla de contenidos.
+\makeatletter
+\def\numberSpaceChapter #1{#1.\enskip}
+% I added .\enskip because without these the dots and the space between the number and the title would disappear altogether.
+
+%Esto se encarga que los capítulos tengan puntos en su tab leader.
+\renewcommand*\l@chapter[2]{%
+  \ifnum \c@tocdepth >\m@ne
+    \addpenalty{-\@highpenalty}%
+    \vskip 1.0em \@plus\p@
+    \setlength\@tempdima{1.5em}%
+    \begingroup
+      \parindent \z@ \rightskip \@pnumwidth
+      \parfillskip -\@pnumwidth
+      \leavevmode \bfseries
+      \advance\leftskip\@tempdima
+      \hskip -\leftskip 
+      \@pnum@font #1\nobreak
+      \xleaders\hbox{$\m@th
+        \mkern \@dotsep mu\hbox{.}\mkern \@dotsep
+        mu$}\hfill%
+      \nobreak\hb@xt@\@pnumwidth{\hss\@pnum@font #2}\par
+      \penalty\@highpenalty
+      %Esto le quita la negrita.
+    \endgroup
+  \fi}
+%Esto renueva los comandos asociados a los otros elementos de la tabla de contenidos para que todo quede bien.
+
+\renewcommand*\l@section{\@dottedtocline{1}{1.5em}{2.3em}}
+\renewcommand*\l@subsection{\@dottedtocline{2}{3.8em}{3.2em}}
+\renewcommand*\l@subsubsection{\@dottedtocline{3}{7.0em}{4.1em}}
+\renewcommand*\l@paragraph{\@dottedtocline{4}{10em}{5em}}
+\renewcommand*\l@subparagraph{\@dottedtocline{5}{12em}{6em}}
+%Esto se encarga de quitarle la negrita a la frontmatter.
+\g@addto@macro{\frontmatter}{\addtocontents{toc}{\protect\def\protect\@pnum@font{\normalfont}}}
+\g@addto@macro{\mainmatter}{\addtocontents{toc}{\protect\def\protect\@pnum@font{\bfseries}}}
+\g@addto@macro{\backmatter}{\addtocontents{toc}{\protect\def\protect\@pnum@font{\bfseries}}}
+\makeatother
+
+%You can change the depth to which section numbering occurs, so you can turn it off selectively. By default it is set to 2. If you only want parts, chapters, and sections numbered, not subsections or subsubsections etc., you can change the value of the secnumdepth counter using the \setcounter command, giving the depth level you wish:
+\setcounter{secnumdepth}{3}
+%A related counter is tocdepth, which specifies what depth to take the Table of Contents to. It can be reset in exactly the same way as secnumdepth. For example:
+\setcounter{tocdepth}{3}
+
+
+%--------------------------------------------------------------------------
+% Comienza el documento
+\begin{document}
+\sloppy %Como \usepackage[none]{hyphenat} evita que las palabras se corten, esta línea realiza la corrección al texto justificado.
+
+\renewcommand{\figurename}{FIGURA}
+\renewcommand{\tablename}{TABLA}
+\renewcommand{\listtablename}{ÍNDICE DE TABLAS}
+\renewcommand{\listfigurename}{ÍNDICE DE FIGURAS}
+
+\setlength{\parindent}{1pt}
+\setlength{\parskip}{\baselineskip} 
+\onehalfspace
+
+
+\begin{titlepage}
+\centering
+\vspace*{-0.4in}
+%--------------------------------------------------------------------------
+%Imagen o logotipo de la UCN
+\includegraphics[scale=0.3]{./images/u.jpg}\\
+{\fontsize{14}{14}\selectfont
+UNIVERSIDAD CATÓLICA DEL NORTE\\
+FACULTAD DE INGENIERÍA Y CIENCIAS GEOLÓGICAS\\
+DEPARTAMENTO DE INGENIERÍA DE SISTEMAS Y COMPUTACIÓN\\}
+\vspace{2.3in}
+%--------------------------------------------------------------------------
+% Titulo del documento
+{\fontsize{18}{18}\bfseries Levantamiento arquitectónico por medio de detección de bordes en nubes de puntos}
+
+Memoria para optar al grado de Licenciado en Ciencias de la Ingeniería y al Titulo de Ingeniero Civil en Computación e Informática\\
+
+%--------------------------------------------------------------------------
+\vspace*{1in}
+%--------------------------------------------------------------------------
+%Datos Personales y/o profesores, alineados a la derecha de la hoja
+\begin{center}
+%\setlength{\leftskip}{7.2cm}
+\fontsize{12}{12}\selectfont
+Felipe Narváez Michea\\
+Profesor Guía: Doctor (c) Juan Bekios Calfa\\
+\end{center}
+
+\vspace*{0.5in}
+
+Antofagasta, Chile\\
+2015\\
+
+\end{titlepage}
+
+%--------------------------------------------------------------------------
+\titleformat{\chapter}%code
+[hang]%shape
+{\fontsize{12}{12}\bfseries\centering}%format
+{\Roman{chapter}{.}\hsp}%label
+{10pt}%sep
+{\fontsize{12}{12}\bfseries}%before code
+\titlespacing*{\chapter}{0cm}{-13.6pt}{0cm}[0cm]
+%--------------------------------------------------------------------------
+%Capítulos sin enumeración, número de pagina en romano
+\frontmatter
+\setcounter{page}{2}
+%--------------------------------------------------------------------------
+% Esta es la TABLA DE CONTENIDO.
+\tableofcontents
+\addtocontents{toc}{\let\protect\numberline\protect\numberSpaceChapter}
+%\addtocontents{toc}{~\hfill\textbf{Página}\par}
+%DES-COMENTAR LA LINEA SIGUIENTE SI ES QUE LA TABLA DE CONTENIDOS TIENE MAS DE UNA PAGINA.
+%\addtocontents{toc}{\protect\afterpage{~\hfill\textbf{Página}\par\medskip}}
+\thispagestyle{plain}
+
+%--------------------------------------------------------------------------
+% Esta es la Tabla de Figuras
+\listoffigures % Índice de figuras
+\addtocontents{lof}{~\hfill\textbf{Página}\par}
+\addcontentsline{toc}{chapter}{ÍNDICE DE FIGURAS} % para que aparezca en la tabla de contenidos
+
+%--------------------------------------------------------------------------
+% Esta es el índice de Tablas
+%\listoftables % índice de tablas
+%\addtocontents{lot}{~\hfill\textbf{Página}\par}
+%\addcontentsline{toc}{chapter}{Índice de Tablas} % para que aparezca en el índice de contenidos
+
+\chapter{NOMENCLATURA}
+\begin{sortedlist}
+\sortitem{CAD (computer-aided design)}
+\end{sortedlist}
+
+%\newpage
+\chapter{GLOSARIO}
+\begin{sortedlist}
+    \sortitem{\textbf{Estacionamiento:} Posición definida estratégicamente en donde se posiciona el escáner de manera tal para realizar el proceso de escaneado o obtención de datos}
+\end{sortedlist}
+
+%\newpage
+\chapter{RESUMEN}
+
+Aqui va el resumen
+
+\paragraph{Palabras claves}
+Palabras claves, separadas por coma (,)
+%--------------------------------------------------------------------------
+%Capítulos normales con enumeración y con número de pagina árabes
+\mainmatter
+%--------------------------------------------------------------------------
+% Defino el formato de titulo para el capítulo, numero romano y el titulo
+% del capítulo separado con una linea de color gris, de esta forma:
+% I | Introducción 
+\titleformat{\chapter}[hang]
+{\fontsize{12}{12}\bfseries}
+{\Roman{chapter}{.}\hsp}{10pt}{\fontsize{12}{12}\bfseries}
+\titlespacing{\chapter}{0cm}{-13.6pt}{0.21cm}[0cm]
+%--------------------------------------------------------------------------
+% TIP
+% Para las secciones pueden probar como
+% \section[nombre corto]{Nombre largo}
+% El nombre corto aparecerá en el índice de contenido
+% el nombre largo aparecerá como titulo de la sección
+% Este tip también sirve para el ambiente \chapter.
+%--------------------------------------------------------------------------
+\chapter[INTRODUCCIÓN]{INTRODUCCIÓN}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale = 0.7]{images/u.jpg}
+\caption{Resultado esperado después de realizar la detección de bordes}
+\label{fig:resultado}
+\end{figure}
+
+
+
+
+\chapter[MARCO TEÓRICO]{MARCO TEÓRICO}
+\label{chapter:marco_teorico}
+
+
+\chapter[PLANTEAMIENTO DEL PROBLEMA]{PLANTEAMIENTO DEL PROBLEMA}
+
+
+\chapter[ANÁLISIS DEL ESTADO DEL ARTE]{ANÁLISIS DEL ESTADO DEL ARTE}
+
+
+\chapter[HIPÓTESIS]{HIPÓTESIS}
+\label{chapter:hipotesis}
+
+\begin{description}
+    \item[$H_{i1}$] hipotesis general
+    \begin{description}
+        \item[$H_{a1}$] hipotesis 1
+
+    \end{description}
+\end{description}
+
+
+\chapter[OBJETIVOS]{OBJETIVOS}
+\label{chapter:objetivos}
+\section{Objetivo general}
+objetivo general
+\section{Objetivos específicos}
+\begin{enumerate}
+\item objetivos especificos
+\end{enumerate}
+
+
+\chapter[METODOLOGÍA]{METODOLOGÍA}
+\label{chapter:metodologia}
+
+
+
+
+\chapter[PLAN DE TRABAJO]{PLAN DE TRABAJO}
+\label{chapter:plan}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{landscape}
+
+
+\section{Cronograma de actividades}
+En la figura \ref{fig:crono} se presenta el cronograma de actividades.
+\begin{figure}[H]
+\centering
+\includegraphics[scale=.4]{images/u.jpg}
+\caption{Cronograma de actividades}
+\label{fig:crono}
+\end{figure}
+\end{landscape}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand\bibname{BIBLIOGRAFÍA}
+\bibliographystyle{IEEEtran}
+%\bibliographystyle{apacite}
+\bibliography{references}{}
+
+%\def\bibindent{1cm}
+%\begin{thebibliography}{99\kern\bibindent}%Si tienes más de 99 editar este número a la cantidad de referencias que tengas ;)
+%\makeatletter
+%\let\old@biblabel\@biblabel
+%\def\@biblabel#1{{}\kern\bibindent} %En el { } agregar \old@biblabel{#1}
+%\let\old@bibitem\bibitem
+%\def\bibitem#1{\old@bibitem{#1}\leavevmode\kern-\bibindent\kern-2.1em}
+%\makeatother
+    
+
+%    \bibitem{1} Law, A. M. y Kelton W. D. (2000). \textit{Simulation Modeling and Analysis} (3 edition). Boston, USA: McGraw-Hill.
+
+%\end{thebibliography}
+\addcontentsline{toc}{chapter}{BIBLIOGRAFÍA}
+
+
+
+%\mainmatter %Esto hace que los anexos SI tengan números de cap.
+%Se utilizan letras en vez de números.
+\titleformat{\chapter}[hang]
+{\fontsize{12}{12}\bfseries}
+{ANEXO\hsp\Alph{chapter}{.}\hsp}{0pt}{\fontsize{12}{12}\bfseries}
+\titlespacing{\chapter}{0cm}{-13.6pt}{0.21cm}[0cm]
+
+%Se utilizan letras en vez de numeros.
+\renewcommand{\thesection}{\Alph{chapter}.\arabic{section}}
+\renewcommand{\thefigure}{\Alph{chapter}.\arabic{figure}}
+\renewcommand{\thetable}{\Alph{chapter}.\arabic{table}}
+
+
+%--------------------------------------------------------------------------
+\end{document}
